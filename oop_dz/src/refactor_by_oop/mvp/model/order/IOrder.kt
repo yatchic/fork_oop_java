@@ -1,4 +1,4 @@
-package refactor_by_oop.mvp.model.tables.order
+package refactor_by_oop.mvp.model.order
 
 interface IOrder {
     fun sortColumnAscending(column: Int)

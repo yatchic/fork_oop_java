@@ -1,4 +1,4 @@
-package refactor_by_oop.mvp.presenter.read
+package refactor_by_oop.mvp.view.read
 
 interface IInputReader {
     fun readLine(): String?

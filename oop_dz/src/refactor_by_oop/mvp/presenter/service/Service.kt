@@ -1,23 +1,21 @@
-package refactor_by_oop.mvp.presenter.commands.processor_commands
+package refactor_by_oop.mvp.presenter.service
 
 import refactor_by_oop.mvp.model.for_text.text.IRegexUtils
 import refactor_by_oop.mvp.model.for_text.text.ITextUtils
 import refactor_by_oop.mvp.model.tables.file.FileManager
-import refactor_by_oop.mvp.model.tables.file.IFileManager
 import refactor_by_oop.mvp.model.tables.manager.ITableManager
 import refactor_by_oop.mvp.model.tables.table.Tree
-import refactor_by_oop.mvp.presenter.comands.processor_comands.ICommandProcessor
-import refactor_by_oop.mvp.presenter.read.IInputReader
+import refactor_by_oop.mvp.view.read.IInputReader
 import refactor_by_oop.mvp.view.errors.IErrorReporter
 
-class CommandProcessor(
+class Service(
     private val inputReader: IInputReader,
     private val regexUtils: IRegexUtils,
     private val tableManager: ITableManager,
     private val fileManager: FileManager,
     private val textUtils: ITextUtils,
     private val errorReporter: IErrorReporter
-) : ICommandProcessor {
+) : IService {
 
     override fun processCommands() {
         val patternTableCreation = "[А-Яа-яA-Za-z]+\\s+(Int|String|Double|Boolean)\\s+(Int|String|Double|Boolean)\\s+(Int|String|Double|Boolean)\\s+(Int|String|Double|Boolean)\\s+(Int|String|Double|Boolean)\\s+(Int|String|Double|Boolean)"
@@ -90,7 +88,7 @@ class CommandProcessor(
         if (tree == null) {
             errorReporter.showError("Table not found: $tableName")
         } else {
-            // Convert parsed values to a list of Any
+
             val anyValues = parsedValues.map { it as Any }
             tree.add(anyValues[0], anyValues[1], anyValues[2], anyValues[3], anyValues[4], anyValues[5])
             textUtils.debug("значения добавлены в таблицу $tableName: $parsedValues")
@@ -103,7 +101,7 @@ class CommandProcessor(
 
         val tree = tableManager.getTable(tableName)
         if (tree == null) {
-            errorReporter.showError("Table not found: $tableName")
+            errorReporter.showError("таблица не найдена: $tableName")
         } else {
             tableManager.removeTable(tableName)
             textUtils.debug("удалена таблица: $tableName")
@@ -117,7 +115,7 @@ class CommandProcessor(
 
         val tree = tableManager.getTable(tableName)
         if (tree == null) {
-            errorReporter.showError("Table not found: $tableName")
+            errorReporter.showError("таблица не найдена: $tableName")
         } else {
             fileManager.saveToFile(path, tableName)
             textUtils.debug("таблица $tableName сохранена в \"$path\"")
@@ -131,18 +129,18 @@ class CommandProcessor(
             "по_возрастанию" -> "ascending"
             "по_убыванию" -> "descending"
             else -> {
-                errorReporter.showError("Invalid order value: ${show[2]}")
+                errorReporter.showError("не верная сортировка: ${show[2]}")
                 return
             }
         }
 
         val tree = tableManager.getTable(tableName)
         if (tree == null) {
-            errorReporter.showError("Table not found: $tableName")
+            errorReporter.showError("таблица не найдена: $tableName")
         } else {
             tree.setSortType(order == "ascending")
             tree.forEach { list -> list.forEach { println(it) } }
-            textUtils.debug("Table $tableName displayed in $order order")
+            textUtils.debug("  $tableName отсортирована $order")
         }
     }
 
@@ -153,7 +151,7 @@ class CommandProcessor(
 
         val tree = tableManager.getTable(tableName)
         if (tree == null) {
-            errorReporter.showError("Table not found: $tableName")
+            errorReporter.showError("таблица не найдена: $tableName")
         } else {
             val columnIndex = when (column) {
                 "1колонку" -> 1
@@ -163,7 +161,7 @@ class CommandProcessor(
                 "5колонку" -> 5
                 "6колонку" -> 6
                 else -> {
-                    errorReporter.showError("Invalid column value: $column")
+                    errorReporter.showError("такой колонки нет: $column")
                     return
                 }
             }
@@ -176,7 +174,7 @@ class CommandProcessor(
                 5 -> tree.getE().forEach { println(it) }
                 6 -> tree.getF().forEach { println(it) }
             }
-            textUtils.debug("Column $columnIndex of table $tableName displayed")
+            textUtils.debug("колонок $columnIndex в таблице $tableName ")
         }
     }
 

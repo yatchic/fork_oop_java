@@ -1,4 +1,4 @@
-package refactor_by_oop.mvp.model.tables.order
+package refactor_by_oop.mvp.model.order
 
 import refactor_by_oop.mvp.model.tables.table.Tree
 
