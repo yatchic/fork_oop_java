@@ -3,12 +3,17 @@
 #### Запуск и работа с консолью
 
 1. Откройте проект в вашей IDE.
-2. Запустите метод `main` в классе `mvp.refactor_by_solid.mvp.presenter.Main`.
+2. Запустите функцию`main` `fun main()`.
 3. Вводите команды в консоль в следующем формате:
 
 ##### Создание новой таблицы
 - Команда: `Создать новую таблицу Имя_таблицы Тип_данных Тип_данных Тип_данных Тип_данных Тип_данных Тип_данных`
-- Пример: `кошки Integer Double String Boolean Integer Double`
+  Из-за того, что проект на котлине и надо вручную прописать все комбинации можно использовать такие параметры:
+ `Int String Double Int Double Boolean   
+  String String String String Double String  
+  Int Double Double Double Double Boolean   
+  Int Double String String String String`
+- Пример: `кошки Int String Double Int Double Boolean`
 - **Примечания:**
     - Имя таблицы и типы данных разделяются пробелами.
     - Имя таблицы не должно содержать пробелы и может включать только русские и латинские символы.
