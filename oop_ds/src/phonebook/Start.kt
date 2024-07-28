@@ -1,10 +1,10 @@
 package phonebook
 
-import phonebook.note.*
+import phonebook.notebook.*
+
 
 
 class Start {
-    val handlerCommands= HandlerCommands(RegexUtils(),TextUtils(),PhoneBook())
-    init{handlerCommands.readCommand()}
-
+     private val  notebook=Notebook()
+     init{ notebook.readCommand() }
 }
