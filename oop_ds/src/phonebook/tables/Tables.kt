@@ -158,5 +158,5 @@ class Tables<T : Any> : Column<T>() {
         }
         return null
     }
-
+fun getTables(): TreeMap<String, TreeMap<String, MutableList<MutableList<T>>>> {return tables}
 }

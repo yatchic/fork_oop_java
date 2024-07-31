@@ -1,9 +1,15 @@
 package phonebook.notebook
 
 
+
+
 import phonebook.RegexUtils
+import phonebook.json.Json
+import phonebook.json.JsonBuilder
 
 import phonebook.tables.Tables
+
+import java.io.File
 
 
 open class Notebook() {
@@ -15,6 +21,7 @@ open class Notebook() {
     private var emails="emails"
     private var email="email"
     private var name="name"
+
     data class Person(var name:String,var number:String,var email:String)
      val person=Person("","","")
     private val tables = Tables<Any>()
@@ -52,6 +59,23 @@ open class Notebook() {
 
         return namesFromNambers!!.joinToString(",")+namesFromEmails!!.joinToString(",")
     }
+
+
+    private fun save(text:String,filePath: String):String {
+        var error=""
+        try {
+
+            File(filePath).writeText(text)
+            error="сохранено в $filePath"
+        } catch (e: Exception) {
+            error="$e...не сохранено в $filePath "
+        }
+        return error
+    }
+
+
+
+
     private val syntax="синтаксис:\n" +
             "addPhone Vasja +465767\n" +
             "addPhone Вася 45565665767  \n" +
@@ -60,17 +84,39 @@ open class Notebook() {
             "show Vasja\n" +
             "find vasa@mail.ru\n" +
             "find 45565665767\n" +
-            "help"
+            "help\n" +
+            "export D:\\загрузки\\familyTrees\\note.json\n" +
+            "можно другое место задать C:\\загрузки\\familyTrees\\note.json"
 
     sealed interface ICommand {
         fun isValid(): Boolean
     }
+
+    sealed class ValidatorByExport(protected val line: String) : ICommand {
+        override fun isValid(): Boolean {
+            var res = false
+            val regexUtils = RegexUtils()
+
+             if (regexUtils.findTextB(line,"^\\s*export\\s+[aA-zZаА-яЯ:\\d\\/\\.]+\\s*$")
+
+            ) {
+
+                res = true
+            }
+
+            return res
+
+        }
+    }
+    class RefValidatorByExport(line: String) : ValidatorByExport(line)
+
+
+
     sealed class ValidatorByFind(protected val line: String) : ICommand {
         override fun isValid(): Boolean {
             var res = false
             val regexUtils = RegexUtils()
-            //"^\\s*find\\s+(\\+?\\d+\\|[aA-zZаА-яЯ_\\d]+@[aA-zZаА-яЯ]+\\.[aA-zZаА-яЯ]+)\\s*$"
-            if (regexUtils.findTextB(line,"^\\s*find\\s+\\+?\\d+\\s*$")||
+             if (regexUtils.findTextB(line,"^\\s*find\\s+\\+?\\d+\\s*$")||
                 regexUtils.findTextB(line,"^\\s*find\\s+[aA-zZаА-яЯ_\\d]+@[aA-zZаА-яЯ]+\\.[aA-zZаА-яЯ]+\\s*$")
             ) {
 
@@ -143,6 +189,7 @@ if(regexUtils.findTextB( line,"\\s*addEmail\\s+[aA-zZаА-яЯ]+\\s+[aA-zZаА-�
             val validatorByNumber =  RefValidatorByNumber(line )
             val validatorByEmail =  RefValidatorByEmail(line )
             val validatorByFind =  RefValidatorByFind(line )
+            val validatorByExport=RefValidatorByExport(line)
             line.let {
                 when {
                     validatorByExit.isValid() ->  repeat = false
@@ -192,6 +239,54 @@ if(regexUtils.findTextB( line,"\\s*addEmail\\s+[aA-zZаА-яЯ]+\\s+[aA-zZаА-�
 
 
                     }
+
+                    validatorByExport.isValid()-> {
+                        var path = regexUtils.findText(line, "[aA-zZаА-яЯ:\\d\\/\\.]+\\s*$")
+                        path = regexUtils.replaceTextAll(path, "\\s+", "")
+                        val numbersNameColumn = tables.getColumn("numbers", "name")
+                        val numbersNumberColumn = tables.getColumn("numbers", "number")
+                        val emailsNameColumn = tables.getColumn("emails", "name")
+                        val emailsEmailColumn = tables.getColumn("emails", "email")
+                        val tables = tables.listTables()
+
+                        val json = Json()
+                        val jsonString = JsonBuilder().apply {
+                            add(numbers, json.array {
+                                if (numbersNameColumn != null) {
+                                    for (i in numbersNameColumn.indices) {
+                                        val valueName = regexUtils.replaceTextAll(numbersNameColumn[i].toString(), "\\[|\\]", "").toString()
+                                        val valueNumber = regexUtils.replaceTextAll(numbersNumberColumn?.get(i)?.toString(), "\\[|\\]", "").toString()
+
+                                        +json.obj {
+                                            "name" to valueName
+                                            "number" to valueNumber
+                                        }
+                                    }
+                                }
+                            })
+                            add(emails, json.array {
+                                if (emailsNameColumn != null) {
+                                    for (i in emailsNameColumn.indices) {
+                                        val valueName = regexUtils.replaceTextAll(emailsNameColumn[i].toString(), "\\[|\\]", "").toString()
+                                        val valueEmail = regexUtils.replaceTextAll(emailsEmailColumn?.get(i)?.toString(), "\\[|\\]", "").toString()
+
+                                        +json.obj {
+                                            "name" to valueName
+                                            "email" to valueEmail
+                                        }
+                                    }
+                                }
+                            })
+                        }.build()
+                        if (path != null) {
+                            val err=save(jsonString,path)
+                            println(err)
+                        }
+
+                    }
+
+
+
                     else -> println(syntax)
                 }
 
