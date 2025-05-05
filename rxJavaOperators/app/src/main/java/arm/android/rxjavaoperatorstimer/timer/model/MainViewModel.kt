@@ -15,7 +15,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
     fun addTimer() {
         val timerVM = TimerViewModel()
         timerVM.timerData.value = TimerData(id = nextId++)
-        _timers.value?.add(timerVM)
-        _timers.postValue(_timers.value) // Уведомить об изменении
+        val newList = _timers.value?.toMutableList() ?: mutableListOf()
+        newList.add(timerVM)
+        _timers.postValue(newList)
     }
 }
