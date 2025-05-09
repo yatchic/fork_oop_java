@@ -1,7 +1,10 @@
 package arm.android.timer_rxjava.timer.model
 
+import android.content.Context
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import arm.android.timer_rxjava.databinding.ActivityMainBinding
@@ -19,9 +22,22 @@ class TimerItemView @Inject constructor(
     private val timerEventBus = PublishSubject.create<TimerEvent>()
     private val timers = mutableMapOf<LinearLayout, Timer>()
     private val disposables = CompositeDisposable()
+    fun resizeLayoutByScreenSize(activity: AppCompatActivity, linearLayout: LinearLayout) {
+        val displayMetrics = DisplayMetrics()
+        val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
 
+        val screenWidthPx = displayMetrics.widthPixels
+        val screenHeightPx = displayMetrics.heightPixels
+
+        val layoutParams = LinearLayout.LayoutParams(screenWidthPx, screenHeightPx)
+        linearLayout.layoutParams = layoutParams
+    }
     init {
-        // Обработка событий таймера
+
+        resizeLayoutByScreenSize(activity,binding.ln0)
+
+
         disposables.add(
             timerEventBus
                 .observeOn(AndroidSchedulers.mainThread())
@@ -46,6 +62,13 @@ class TimerItemView @Inject constructor(
                     disposables.add(disposable)
                 }
         )
+
+
+
+
+
+
+
 
         binding.addTimer.setOnClickListener {
             addNewTimerRow()
