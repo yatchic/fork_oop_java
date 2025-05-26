@@ -1,0 +1,34 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="arm.android.ehzik">
+
+
+    <permission
+        android:name="arm.android.ehzik.HEAR_BROADCAST"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="arm.android.ehzik.HEAR_BROADCAST"/>
+
+    <application
+        android:label="Ёжик"
+        android:theme="@style/Theme.App">
+
+
+        <receiver
+            android:name=".YozhikReceiver"
+            android:exported="true"
+            android:permission="arm.android.ehzik.HEAR_BROADCAST">
+            <intent-filter>
+                <action android:name="Yozhik!"/>
+            </intent-filter>
+        </receiver>
+
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

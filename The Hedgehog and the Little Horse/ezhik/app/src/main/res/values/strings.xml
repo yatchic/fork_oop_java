@@ -1,0 +1,7 @@
+<resources>
+
+        <string name="app_name">ehzik</string>
+      <string name="yozhik_internal_permission_label">Разрешение для Ежика (внутреннее)</string>
+     <string name="yozhik_internal_permission_description">Позволяет отправлять внутренние сообщения компонентам приложения Ежик.</string>
+
+</resources>
